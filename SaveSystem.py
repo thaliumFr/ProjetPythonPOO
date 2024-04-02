@@ -20,13 +20,9 @@ class Csv:
         return maxCol
 
     def Save(self):
-        with open(self.name + ".csv", "w") as file:
-            txt = []
-
+        with open(self.name + ".csv", "w", encoding="utf-8") as file:
             for i in self.content:
-                txt.append(",".join(i) + "\n")
-
-            file.writelines(txt)
+                file.write(",".join(i) + "\n")
 
     @staticmethod
     def Load(name: str) -> "Csv":

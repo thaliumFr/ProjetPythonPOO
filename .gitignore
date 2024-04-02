@@ -1,0 +1,6 @@
+ui.csv
+__pycache__
+__pycache__/*
+*.pyc
+*_cache
+.vscode

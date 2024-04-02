@@ -4,11 +4,12 @@
 
 
 # What we get from where
-## Metacritics
+## OpenCritics
 - Top Critic Average %
 - Critics Recommend %
 - OpenCritic Rating
 - Available Stores
+- release date
 
 ## oculusdb
 - Current price
@@ -17,3 +18,8 @@
 - Publisher
 - Release time
 - Package Id
+
+## Steam API
+- Steam ID
+- Game Name
+- release Date
