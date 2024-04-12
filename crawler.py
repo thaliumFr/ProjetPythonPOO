@@ -14,17 +14,21 @@ class Crawler:
     def __init__(self, url, elements):
         self.url = url
         self.elements = elements
+        driver = webdriver.Firefox()
+        self.driver = driver
 
     def reponse(self):
-        driver = webdriver.Firefox()
-        driver.get(self.url)
-        self.driver = driver
+        driver = self.driver
 
         res = {}
         for element in self.elements:
-            WebDriverWait(driver, 10).until(
-                lambda driver: driver.find_element(By.CLASS_NAME, element)
-            )
+            try:
+                WebDriverWait(driver, 10).until(
+                    lambda driver: driver.find_element(By.CLASS_NAME, element)
+                )
+            except:
+                self.elementsValues = res
+                return
             elements = driver.find_elements(By.CLASS_NAME, element)
 
             elList = []
