@@ -11,6 +11,8 @@ class Crawler:
 
     driver: webdriver.Firefox
 
+    __timeout = 5
+
     def __init__(self, url, elements):
         self.url = url
         self.elements = elements
@@ -23,7 +25,7 @@ class Crawler:
         res = {}
         for element in self.elements:
             try:
-                WebDriverWait(driver, 10).until(
+                WebDriverWait(driver, self.__timeout).until(
                     lambda driver: driver.find_element(By.CLASS_NAME, element)
                 )
             except:

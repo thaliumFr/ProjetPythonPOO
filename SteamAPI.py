@@ -4,14 +4,13 @@ from matplotlib import dates, pyplot as plt
 import requests
 import time
 
+from Game import Game
+
 key = "06FC90592BA536743D3365CDF555E80A"
 
 
-class SteamGame:
+class SteamGame(Game):
     appid: str
-    name: str
-    price: str
-    release: datetime
 
     _months = {
         "Jan": "01",
@@ -28,11 +27,9 @@ class SteamGame:
         "Dec": "12",
     }
 
-    def __init__(self, appid, name, price, release) -> None:
+    def __init__(self, appid) -> None:
+        super.__init__()
         self.appid = appid
-        self.name = name
-        self.price = price
-        self.release = release
 
     @staticmethod
     def GetAllGames() -> list["SteamGame"]:

@@ -18,12 +18,23 @@ crawler_opencritique = Crawler(
 )
 
 OpenCriticsGames = Csv("OpenCritics")
-OpenCriticsGames.Add(["Name", "link"])
+OpenCriticsGames.Add(
+    [
+        "Name",
+        "link",
+        "devs",
+        "release",
+        "note AVG",
+        "critics recommend",
+        "price",
+        "isMultiplayer",
+        "ageLimit",
+    ]
+)
 
 allLinks = []
-for i in range(maxPagesOnOpenCritics):
-
-    crawler_opencritique.driver.get(crawler_opencritique.url + str(i + 1))
+for y in range(1):
+    crawler_opencritique.driver.get(crawler_opencritique.url + str(y + 1))
 
     crawler_opencritique.reponse()
 
@@ -38,22 +49,44 @@ for i in range(maxPagesOnOpenCritics):
         except:
             pass
 
+crawler_opencritique.end()
+
+pageDetailsClasses = [
+    "companies",
+    "platforms",
+    "inner-orb",
+]
+crawler_pageDetails = Crawler("https://opencritic.com/", pageDetailsClasses)
+games = []
+y = 0
+for link in allLinks:
+    crawler_pageDetails.driver.get(link)
+
+    crawler_pageDetails.reponse()
+
+    for classname in pageDetailsClasses:
+        if crawler_pageDetails.elementsValues.__contains__(classname):
+            TextVals = []
+            # Companies
+            for el in crawler_pageDetails.elementsValues[classname]:
+                txt = el.text
+
+                if classname == pageDetailsClasses[1]:
+                    txt = txt.split("-")[0].strip()
+
+                TextVals.append(txt)
+            OpenCriticsGames.AddToLine(y + 1, ",".join(TextVals))
+
+    y += 1
+
 OpenCriticsGames.Save()
 
 
-for link in allLinks:
-    crawler_opencritique.driver.get(link)
-
-    crawler_opencritique.reponse()
-
-crawler_opencritique.end()
-
-
 # API
-SteamGames = Csv("SteamGames")
-SteamGames.Add(["appid", "name", "price"])
-for game in SteamGame.GetAllGames():
-    # print(game)
-    SteamGames.Add(game.toList())
+# SteamGames = Csv("SteamGames")
+# SteamGames.Add(["appid", "name", "price"])
+# for game in SteamGame.GetAllGames():
+#     # print(game)
+#     SteamGames.Add(game.toList())
 
-SteamGames.Save()
+# SteamGames.Save()
