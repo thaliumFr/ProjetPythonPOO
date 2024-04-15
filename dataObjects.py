@@ -11,7 +11,12 @@ fileCSV = Csv.Load("OpenCritics")
 dataImportOC = DataImporter("OpenCritics.csv")
 labels = dataImportOC.getColumnData("Name")
 values = dataImportOC.getColumnData("note AVG")
-
-print(dataImportOC.header)
+idx = 0
+while idx < len(labels):
+    if values[idx] == "none":
+        del values[idx]
+        del labels[idx]
+        continue
+    idx += 1
 
 Graphics.showBar("Note moyenne par jeux", labels, values, "Noms des jeux", "Notes")
