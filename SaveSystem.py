@@ -34,11 +34,14 @@ class Csv:
     @staticmethod
     def Load(name: str) -> "Csv":
         content = []
-        with open(name + ".csv", "r") as file:
+        with open(name + ".csv", "r", encoding="utf8") as file:
             for i in file.readlines():
-                line = i.split(Csv.__separator)
-                line[-1] = line[-1].rstrip("\n").strip('"')
-                content.append(line)
+                i = i.rstrip("\n")
+                import re
+
+                PATTERN = re.compile(r"""((?:[^,"']|"[^"]*"|'[^']*')+)""")
+
+                content.append(PATTERN.split(i)[1::2])
 
         csv = Csv(name)
         csv.content = content

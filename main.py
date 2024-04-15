@@ -11,8 +11,11 @@ import matplotlib.pyplot as plt
 
 import threading
 
+from graphics import Graphics
+
 maxPagesOnOpenCritics = 766
-DoCrawl = True
+DoCrawl = False
+DoAPI = False
 
 pageDetailsClasses = [
     "companies",
@@ -44,7 +47,7 @@ def CrawlOpenCritics(Multithreading=True):
     )
 
     allLinks = []
-    for y in range(maxPagesOnOpenCritics):
+    for y in range(2):
         crawler_opencritique.driver.get(crawler_opencritique.url + str(y + 1))
 
         crawler_opencritique.reponse()
@@ -117,10 +120,30 @@ if __name__ == "__main__":
     if DoCrawl:
         CrawlOpenCritics()
 
-    # API
-    SteamGames = Csv("SteamGames")
-    SteamGames.Add(["appid", "name", "price"])
-    for game in SteamGame.GetAllGames():
-        SteamGames.Add(game.toList())
+    if DoAPI:
+        # API
+        SteamGames = Csv("SteamGames")
+        SteamGames.Add(["appid", "name", "price"])
+        for game in SteamGame.GetAllGames():
+            SteamGames.Add(game.toList())
 
-    SteamGames.Save()
+        SteamGames.Save()
+
+    data = Csv.Load("OpenCritics")
+
+    NoteSum = 0
+    points = []
+    for y in range(data.lines - 2):
+        note = data.content[y + 1][4].strip('"')
+        date = data.content[y + 1][3].strip('"')[-4::]
+        print(date)
+
+        if note == "none":
+            continue
+        NoteSum += int(note)
+
+        points.append((int(date), int(note)))
+
+    Graphics.show2setsPlots("Note per game on years", [points])
+
+    print(NoteSum, NoteSum / (data.lines - 1))
