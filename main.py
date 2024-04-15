@@ -33,67 +33,70 @@ OpenCriticsGames.Add(
     ]
 )
 
-start = time.time()
 
-allLinks = []
-for y in range(1):
-    crawler_opencritique.driver.get(crawler_opencritique.url + str(y + 1))
+def CrawlOpenCritics():
+    start = time.time()
 
-    crawler_opencritique.reponse()
+    allLinks = []
+    for y in range(1):
+        crawler_opencritique.driver.get(crawler_opencritique.url + str(y + 1))
 
-    for el in crawler_opencritique.elementsValues["game-name"]:
-        try:
-            a = el.find_element(By.TAG_NAME, "a")
-            link = a.get_attribute("href")
-            print(link)
-            allLinks.append(link)
+        crawler_opencritique.reponse()
 
-            OpenCriticsGames.Add([a.text, link])
-        except:
-            pass
+        for el in crawler_opencritique.elementsValues["game-name"]:
+            try:
+                a = el.find_element(By.TAG_NAME, "a")
+                link = a.get_attribute("href")
+                print(link)
+                allLinks.append(link)
 
-crawler_opencritique.end()
+                OpenCriticsGames.Add([a.text, link])
+            except:
+                pass
 
-pageDetailsClasses = [
-    "companies",
-    "platforms",
-    "inner-orb",
-]
-crawler_pageDetails = Crawler("https://opencritic.com/", pageDetailsClasses)
-games = []
-y = 0
-for link in allLinks:
-    crawler_pageDetails.driver.get(link)
+    crawler_opencritique.end()
 
-    crawler_pageDetails.reponse()
+    pageDetailsClasses = [
+        "companies",
+        "platforms",
+        "inner-orb",
+    ]
+    crawler_pageDetails = Crawler("https://opencritic.com/", pageDetailsClasses)
+    games = []
+    y = 0
+    for link in allLinks:
+        crawler_pageDetails.driver.get(link)
 
-    for classname in pageDetailsClasses:
-        if crawler_pageDetails.elementsValues.__contains__(classname):
-            TextVals = []
-            # Companies
-            for el in crawler_pageDetails.elementsValues[classname]:
-                txt = el.text
+        crawler_pageDetails.reponse()
 
-                if classname == pageDetailsClasses[1]:
-                    txt = txt.split("-")[0].strip()
+        for classname in pageDetailsClasses:
+            if crawler_pageDetails.elementsValues.__contains__(classname):
+                TextVals = []
+                # Companies
+                for el in crawler_pageDetails.elementsValues[classname]:
+                    txt = el.text
 
-                TextVals.append(txt)
+                    if classname == pageDetailsClasses[1]:
+                        txt = txt.split("-")[0].strip()
 
-            OpenCriticsGames.AddToLine(y + 1, TextVals)
+                    TextVals.append(txt)
 
-    lineLength = len(OpenCriticsGames.content[y + 1])
-    expectedLenght = 6
-    for x in range(expectedLenght - lineLength):
-        OpenCriticsGames.AddToLine(y + 1, "none")
+                OpenCriticsGames.AddToLine(y + 1, TextVals)
 
-    y += 1
+        lineLength = len(OpenCriticsGames.content[y + 1])
+        expectedLenght = 6
+        for x in range(expectedLenght - lineLength):
+            OpenCriticsGames.AddToLine(y + 1, "none")
 
-OpenCriticsGames.Save()
-crawler_pageDetails.end()
+        y += 1
 
-end = time.time()
+    OpenCriticsGames.Save()
+    crawler_pageDetails.end()
 
-print(f"Crawl ended in {end-start} seconds")
+    end = time.time()
+
+    print(f"Crawl ended in {end-start} seconds")
+
 
 # API
 # SteamGames = Csv("SteamGames")
@@ -103,3 +106,6 @@ print(f"Crawl ended in {end-start} seconds")
 #     SteamGames.Add(game.toList())
 
 # SteamGames.Save()
+
+if __name__ == "__main__":
+    CrawlOpenCritics()
