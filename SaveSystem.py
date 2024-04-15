@@ -71,3 +71,6 @@ class Csv:
             if data == txt:
                 count += 1
         return count
+
+    def hasInRow(self, txt: str, row=0):
+        return self.content[row].__contains__(txt)

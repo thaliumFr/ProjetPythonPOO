@@ -34,7 +34,7 @@ class SteamGame(Game):
     @staticmethod
     def GetAllGames() -> list["SteamGame"]:
 
-        start = time.time_ns()
+        start = time.time()
         url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/?key=" + key
         gamesJson = requests.get(url)
         gamesList = []
@@ -45,15 +45,16 @@ class SteamGame(Game):
 
         num = 1
         for game in allGames:
-            if num % 10 == 0:
-                current = time.time_ns()
-                print(
-                    f"{num}/{allGamesLen} done ({num/allGamesLen*100}%) in {round((current-start)/(10^9), 2)}ns"
-                )
+
+            current = time.time()
+            print(
+                f"{num}/{allGamesLen} done ({num/allGamesLen*100}%) in {round((current-start)/(10^9), 2)}s"
+            )
 
             gamedata = SteamGame.getGameData(str(game["appid"]))
 
             if gamedata == None:
+                num += 1
                 continue
 
             steamGame = SteamGame(

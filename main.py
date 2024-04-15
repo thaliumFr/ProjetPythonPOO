@@ -9,8 +9,16 @@ from selenium.webdriver.remote.webelement import WebElement
 from SaveSystem import Csv
 import matplotlib.pyplot as plt
 
+import threading
+
 maxPagesOnOpenCritics = 766
-DoCrawl = False
+DoCrawl = True
+
+pageDetailsClasses = [
+    "companies",
+    "platforms",
+    "inner-orb",
+]
 
 OpenCriticsGames = Csv("OpenCritics")
 OpenCriticsGames.Add(
@@ -28,7 +36,7 @@ OpenCriticsGames.Add(
 )
 
 
-def CrawlOpenCritics():
+def CrawlOpenCritics(Multithreading=True):
     start = time.time()
     crawler_opencritique = Crawler(
         "https://opencritic.com/browse/all/all-time/name?page=",
@@ -36,7 +44,7 @@ def CrawlOpenCritics():
     )
 
     allLinks = []
-    for y in range(1):
+    for y in range(maxPagesOnOpenCritics):
         crawler_opencritique.driver.get(crawler_opencritique.url + str(y + 1))
 
         crawler_opencritique.reponse()
@@ -54,14 +62,28 @@ def CrawlOpenCritics():
 
     crawler_opencritique.end()
 
-    pageDetailsClasses = [
-        "companies",
-        "platforms",
-        "inner-orb",
-    ]
-    crawler_pageDetails = Crawler("https://opencritic.com/", pageDetailsClasses)
     games = []
-    y = 0
+
+    threads = 4
+    # for thread in range(threads):
+    #     linksRange =
+
+    #     process = threading.Thread(target=crawlLinks, args=())
+    #     process.start()
+    #     process.join()
+
+    crawlLinks(allLinks)
+
+    OpenCriticsGames.Save()
+
+    end = time.time()
+
+    print(f"Crawl ended in {end-start} seconds")
+
+
+def crawlLinks(allLinks):
+    y = 1
+    crawler_pageDetails = Crawler("https://opencritic.com/", pageDetailsClasses)
     for link in allLinks:
         crawler_pageDetails.driver.get(link)
 
@@ -79,21 +101,16 @@ def CrawlOpenCritics():
 
                     TextVals.append(txt)
 
-                OpenCriticsGames.AddToLine(y + 1, TextVals)
+                OpenCriticsGames.AddToLine(y, TextVals)
 
-        lineLength = len(OpenCriticsGames.content[y + 1])
+        lineLength = len(OpenCriticsGames.content[y])
         expectedLenght = 6
         for x in range(expectedLenght - lineLength):
-            OpenCriticsGames.AddToLine(y + 1, "none")
+            OpenCriticsGames.AddToLine(y, "none")
 
         y += 1
 
-    OpenCriticsGames.Save()
     crawler_pageDetails.end()
-
-    end = time.time()
-
-    print(f"Crawl ended in {end-start} seconds")
 
 
 if __name__ == "__main__":
