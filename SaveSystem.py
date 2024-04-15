@@ -2,7 +2,7 @@ class Csv:
     content: list[list] = []
     name: str = "default"
 
-    __separator = ","
+    __separator = ";"
 
     def __init__(self, name: str) -> None:
         self.content = []

@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
+from SaveSystem import Csv
+
+fileCSV = Csv.Load("OpenCritics")
 
 
 # create class columns graph
@@ -14,6 +18,7 @@ class Graphics:
         plt.title(title)
         plt.xlabel(x_name)
         plt.ylabel(y_name)
+        plt.xticks(rotation=60)
         plt.show()
 
     # create pie charts
@@ -27,8 +32,6 @@ class Graphics:
 
     # create 2 sets of scatter plots for comparison
     def show2setsPlots(title: str, values: list):
-
-        # instance one
         for value in values:
             x = []
             y = []
