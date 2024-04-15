@@ -8,15 +8,9 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from SaveSystem import Csv
 import matplotlib.pyplot as plt
-from time import sleep
 
 maxPagesOnOpenCritics = 766
-
-
-crawler_opencritique = Crawler(
-    "https://opencritic.com/browse/all/all-time/name?page=",
-    ["game-name"],
-)
+DoCrawl = False
 
 OpenCriticsGames = Csv("OpenCritics")
 OpenCriticsGames.Add(
@@ -36,6 +30,10 @@ OpenCriticsGames.Add(
 
 def CrawlOpenCritics():
     start = time.time()
+    crawler_opencritique = Crawler(
+        "https://opencritic.com/browse/all/all-time/name?page=",
+        ["game-name"],
+    )
 
     allLinks = []
     for y in range(1):
@@ -98,14 +96,14 @@ def CrawlOpenCritics():
     print(f"Crawl ended in {end-start} seconds")
 
 
-# API
-# SteamGames = Csv("SteamGames")
-# SteamGames.Add(["appid", "name", "price"])
-# for game in SteamGame.GetAllGames():
-#     # print(game)
-#     SteamGames.Add(game.toList())
-
-# SteamGames.Save()
-
 if __name__ == "__main__":
-    CrawlOpenCritics()
+    if DoCrawl:
+        CrawlOpenCritics()
+
+    # API
+    SteamGames = Csv("SteamGames")
+    SteamGames.Add(["appid", "name", "price"])
+    for game in SteamGame.GetAllGames():
+        SteamGames.Add(game.toList())
+
+    SteamGames.Save()

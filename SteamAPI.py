@@ -50,7 +50,9 @@ class SteamGame(Game):
                 print(
                     f"{num}/{allGamesLen} done ({num/allGamesLen*100}%) in {round((current-start)/(10^9), 2)}ns"
                 )
+
             gamedata = SteamGame.getGameData(str(game["appid"]))
+
             if gamedata == None:
                 continue
 
@@ -79,7 +81,7 @@ class SteamGame(Game):
         if not isinstance(appid, str):
             appid = str(appid)
 
-        url = "https://store.steampowered.c appdetails?appids=" + appid
+        url = "https://store.steampowered.com/api/appdetails?appids=" + appid
         gamedatajson: requests.Response
         try:
             gamedatajson = requests.get(url)
@@ -94,7 +96,7 @@ class SteamGame(Game):
             return
         gamedata = gamedata[appid]
 
-        if gamedata["success"] == False:
+        if not gamedata["success"]:
             return
 
         return gamedata["data"]

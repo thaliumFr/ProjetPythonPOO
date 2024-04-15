@@ -2,7 +2,7 @@ class Csv:
     content: list[list] = []
     name: str = "default"
 
-    __separator = ";"
+    __separator = ","
 
     def __init__(self, name: str) -> None:
         self.content = []
@@ -53,3 +53,21 @@ class Csv:
                 self.content[y].append(el)
         else:
             self.content[y].append(line)
+
+    def hasInColumn(self, txt, col=0):
+        for i in self.content:
+            if i[col] == txt:
+                return True
+        return False
+
+    def CountInColumn(self, txt: str, col=0, caseSensitive=False):
+        count = 0
+        if not caseSensitive:
+            txt = txt.lower()
+        for i in self.content:
+            data: str = i[col]
+            if not caseSensitive:
+                data = data.lower()
+            if data == txt:
+                count += 1
+        return count
