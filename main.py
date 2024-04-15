@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 import threading
 
-from graphics import Graphics
+from GraphDisplay import GraphDisplay
 
 maxPagesOnOpenCritics = 766
 DoCrawl = False
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
         points.append((int(date), int(note)))
 
-    Graphics.show2setsPlots(
+    GraphDisplay.show2setsPlots(
         "Note per game on years", [points], x_name="Year of release", y_name="Score"
     )
 
