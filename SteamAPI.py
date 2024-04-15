@@ -1,8 +1,12 @@
 import datetime
 import json
+from math import floor
 from matplotlib import dates, pyplot as plt
 import requests
 import time
+
+from multiprocessing import Process
+
 
 from Game import Game
 
@@ -33,23 +37,47 @@ class SteamGame(Game):
 
     @staticmethod
     def GetAllGames() -> list["SteamGame"]:
-
-        start = time.time()
         url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/?key=" + key
         gamesJson = requests.get(url)
-        gamesList = []
-
         allGames = json.loads(gamesJson.content)["applist"]["apps"]
         allGamesLen = len(allGames)
-        print(f"{allGamesLen} games found")
+        gamesList = []
 
-        num = 1
-        for game in allGames:
-
-            current = time.time()
-            print(
-                f"{num}/{allGamesLen} done ({num/allGamesLen*100}%) in {round((current-start)/(10^9), 2)}s"
+        threads = 8
+        allProcesses = []
+        for i in range(threads):
+            mini = floor(i * (allGamesLen / threads))
+            maxi = floor((i + 1) * (allGamesLen / threads))
+            print(f"starting process from {mini} to {maxi}")
+            thread = Process(
+                target=SteamGame.getGameinRange, args=((mini, maxi), gamesList)
             )
+            allProcesses.append(thread)
+
+        for thread in allProcesses:
+            thread.start()
+
+        for thread in allProcesses:
+            thread.join()
+
+        print("Done", flush=True)
+
+        return gamesList
+
+    def getGameinRange(minmax: tuple, gamesList):
+        start = time.time()
+        num = 1
+        url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/?key=" + key
+        gamesJson = requests.get(url)
+        allGames = json.loads(gamesJson.content)["applist"]["apps"]
+        allGamesLen = len(allGames)
+        for game in range(minmax[0], minmax[1]):
+            game = allGames[game]
+            current = time.time()
+            if num % 10 == 0:
+                print(
+                    f"{num}/{minmax[1]-minmax[0]} done ({round(num/(minmax[1]-minmax[0])*100, 3)}%) in {round((current-start)/(10^9), 2)}s"
+                )
 
             gamedata = SteamGame.getGameData(str(game["appid"]))
 
@@ -74,7 +102,6 @@ class SteamGame(Game):
 
             gamesList.append(steamGame)
             num += 1
-        return gamesList
 
     @staticmethod
     def getGameData(appid) -> list:

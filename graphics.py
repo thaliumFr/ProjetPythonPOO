@@ -31,7 +31,7 @@ class Graphics:
         plt.show()
 
     # create 2 sets of scatter plots for comparison
-    def show2setsPlots(title: str, values: list):
+    def show2setsPlots(title: str, values: list, x_name="", y_name=""):
         for value in values:
             x = []
             y = []
@@ -42,6 +42,8 @@ class Graphics:
             y_np = np.array(y)
             plt.scatter(x_np, y_np)
         plt.autoscale()
+        plt.xlabel(x_name)
+        plt.ylabel(y_name)
         plt.show()
 
 

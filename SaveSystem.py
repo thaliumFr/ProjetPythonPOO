@@ -77,3 +77,19 @@ class Csv:
 
     def hasInRow(self, txt: str, row=0):
         return self.content[row].__contains__(txt)
+
+    def FindInColumn(self, txt, col=0):
+        for i in range(self.columns - 1):
+            if self.content[i][col].lower() == txt.lower():
+                return i
+        return -1
+
+    def GetColumn(self, i: int):
+        data = []
+        for el in self.content:
+            data.append(el[i])
+
+        return data
+
+    def GetRow(self, i: int):
+        return self.content[i]

@@ -15,7 +15,7 @@ from graphics import Graphics
 
 maxPagesOnOpenCritics = 766
 DoCrawl = False
-DoAPI = False
+DoAPI = True
 
 pageDetailsClasses = [
     "companies",
@@ -122,12 +122,10 @@ if __name__ == "__main__":
 
     if DoAPI:
         # API
-        SteamGames = Csv("SteamGames")
-        SteamGames.Add(["appid", "name", "price"])
+        SteamGames = Csv("OpenCritics")
         for game in SteamGame.GetAllGames():
-            SteamGames.Add(game.toList())
-
-        SteamGames.Save()
+            if SteamGames.hasInColumn(game.name):
+                SteamGames.AddToLine(SteamGames.FindInColumn(game.name), game.price)
 
     data = Csv.Load("OpenCritics")
 
@@ -144,6 +142,8 @@ if __name__ == "__main__":
 
         points.append((int(date), int(note)))
 
-    Graphics.show2setsPlots("Note per game on years", [points])
+    Graphics.show2setsPlots(
+        "Note per game on years", [points], x_name="Year of release", y_name="Score"
+    )
 
     print(NoteSum, NoteSum / (data.lines - 1))
