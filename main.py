@@ -1,3 +1,4 @@
+import time
 from SteamAPI import SteamGame
 from crawler import Crawler
 
@@ -31,6 +32,8 @@ OpenCriticsGames.Add(
         "ageLimit",
     ]
 )
+
+start = time.time()
 
 allLinks = []
 for y in range(1):
@@ -75,12 +78,22 @@ for link in allLinks:
                     txt = txt.split("-")[0].strip()
 
                 TextVals.append(txt)
-            OpenCriticsGames.AddToLine(y + 1, ",".join(TextVals))
+
+            OpenCriticsGames.AddToLine(y + 1, TextVals)
+
+    lineLength = len(OpenCriticsGames.content[y + 1])
+    expectedLenght = 6
+    for x in range(expectedLenght - lineLength):
+        OpenCriticsGames.AddToLine(y + 1, "none")
 
     y += 1
 
 OpenCriticsGames.Save()
+crawler_pageDetails.end()
 
+end = time.time()
+
+print(f"Crawl ended in {end-start} seconds")
 
 # API
 # SteamGames = Csv("SteamGames")

@@ -29,4 +29,3 @@
 - prix par studio
 - prix par genre
 - % des genre sur l'enssemble des jeux (camambert)
-- 

@@ -11,7 +11,7 @@ class Crawler:
 
     driver: webdriver.Firefox
 
-    __timeout = 5
+    __timeout = 2
 
     def __init__(self, url, elements):
         self.url = url
