@@ -7,8 +7,8 @@ import csv
 class DataImporter:
     def __init__(self, csvFile):
         self.rows = []
-        with open(csvFile, 'r') as file:
-            csvreader = csv.reader(file, delimiter = ",")
+        with open(csvFile, 'r', encoding="utf-8") as file:
+            csvreader = csv.reader(file, delimiter = ";")
             self.header = next(csvreader)
             for row in csvreader:
                 self.rows.append(row)
