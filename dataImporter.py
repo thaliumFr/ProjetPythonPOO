@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
-from SaveSystem import Csv
-fileCSV = Csv.Load("OpenCritics")
+# from SaveSystem import Csv
+# fileCSV = Csv.Load("OpenCritics")
 
 class DataImporter:
     def __init__(self, csvFile):
         self.rows = []
         with open(csvFile, 'r') as file:
-            csvreader = csv.reader(file, delimiter = ";")
+            csvreader = csv.reader(file, delimiter = ",")
             self.header = next(csvreader)
             for row in csvreader:
                 self.rows.append(row)

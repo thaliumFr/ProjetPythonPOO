@@ -11,13 +11,11 @@ import matplotlib.pyplot as plt
 
 from multiprocessing import Process
 
-from graphics import Graphics
+from GraphDisplay import GraphDisplay
 
-gameLimit = 100
-
-maxPagesOnOpenCritics = 5  # 766 max
-DoCrawl = True
-DoAPI = False
+maxPagesOnOpenCritics = 766
+DoCrawl = False
+DoAPI = True
 
 pageDetailsClasses = [
     "companies",
@@ -150,7 +148,8 @@ if __name__ == "__main__":
         NoteSum += int(note)
 
         points.append((int(date), int(note)))
-    Graphics.show2setsPlots(
+
+    GraphDisplay.show2setsPlots(
         "Note per game on years", [points], x_name="Year of release", y_name="Score"
     )
 

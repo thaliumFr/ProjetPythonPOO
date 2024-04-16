@@ -1,14 +1,32 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
-from SaveSystem import Csv
+# from SaveSystem import Csv
 
-fileCSV = Csv.Load("OpenCritics")
+# fileCSV = Csv.Load("OpenCritics")
 
 
 # create class columns graph
-class Graphics:
-    @staticmethod
+class GraphDisplay:
+    def __init__(self, nbOfPlots):
+        self.fig, self.ax = plt.subplots(1, nbOfPlots, figsize=(15, 8))
+        plt.subplots_adjust(bottom=.3)
+        self.pltIdx = 0
+
+    def addBar(self, title: str, x: list, y: list):
+        x_np = np.array(x)
+        y_np = np.array(y)
+
+        self.ax[self.pltIdx].bar(x_np, y_np)
+        self.ax[self.pltIdx].set_title(title)
+        for tick in self.ax[self.pltIdx].get_xticklabels():
+            tick.set_rotation(-90)
+            tick.set_fontsize(8)
+        self.pltIdx += 1
+
+    def display(self):
+        plt.show()
+
     # create columns graph
     def showBar(title: str, x: list, y: list, x_name="", y_name=""):
         x_np = np.array(x)
@@ -18,7 +36,7 @@ class Graphics:
         plt.title(title)
         plt.xlabel(x_name)
         plt.ylabel(y_name)
-        plt.xticks(rotation=60)
+        plt.xticks(rotation=60, fontsize=11)
         plt.show()
 
     # create pie charts
@@ -48,8 +66,8 @@ class Graphics:
 
 
 if __name__ == "__main__":
-    Graphics.showBar("nom du graph", ["A", "B"], [1, 5], "x")
-    Graphics.showPie(
+    GraphDisplay.showBar("nom du graph", ["A", "B"], [1, 5], "x")
+    GraphDisplay.showPie(
         "nom graph", [35, 15, 23, 27], ["chiens", "chats", "poissons", "chevaux"]
     )
-    Graphics.show2setsPlots("nom graphe", [[(1, 5), (2, 7)], [(5, 6), (9, 5), (6, 1)]])
+    GraphDisplay.show2setsPlots("nom graphe", [[(1, 5), (2, 7)], [(5, 6), (9, 5), (6, 1)]])
