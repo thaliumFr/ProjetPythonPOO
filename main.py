@@ -3,21 +3,16 @@ from SteamAPI import SteamGame
 from crawler import Crawler
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.remote.webelement import WebElement
 
 from SaveSystem import Csv
-import matplotlib.pyplot as plt
-
-from multiprocessing import Process
 
 from GraphDisplay import GraphDisplay
 
-gameLimit = 100
+gameLimit = 1000
 
 maxPagesOnOpenCritics = 5  # 766 max
-DoCrawl = True
-DoAPI = False
+DoCrawl = False
+DoAPI = True
 
 pageDetailsClasses = [
     "companies",
@@ -120,10 +115,11 @@ def crawlLinks(allLinks):
 
 def crawlSteam():
     SteamData = Csv.Load("SteamGames")
+    SteamData.content = []
+
     # API
     for game in SteamGame.GetAllGames(gameLimit):
-        print(game)
-        print(game.toList())
+
         # if data.hasInColumn(game.name):
         #     data.AddToLine(data.FindInColumn(game.name), game.price)
         SteamData.Add(game.toList())

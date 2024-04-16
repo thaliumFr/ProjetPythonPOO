@@ -1,8 +1,6 @@
 import datetime
 import json
 from math import floor
-from multiprocessing.managers import DictProxy, ListProxy
-from multiprocessing.sharedctypes import SynchronizedArray
 from matplotlib import dates, pyplot as plt
 import requests
 import time
@@ -34,7 +32,7 @@ class SteamGame(Game):
     }
 
     def __init__(self, appid) -> None:
-        super.__init__()
+        super().__init__()
         self.appid = appid
 
     @staticmethod
@@ -52,7 +50,7 @@ class SteamGame(Game):
         MULTITHREADING = False
 
         if MULTITHREADING:
-            threads = 6
+            threads = 4
             allProcesses = []
 
             for i in range(threads):
@@ -63,12 +61,14 @@ class SteamGame(Game):
                     target=SteamGame.getGameinRange, args=(mini, maxi, gamesList)
                 )
                 allProcesses.append(thread)
+
+            for thread in allProcesses:
                 thread.start()
 
             for thread in allProcesses:
                 thread.join()
         else:
-            gamesList = SteamGame.getGameinRange(0, allGamesLen, gamesList)
+            SteamGame.getGameinRange(0, allGamesLen, gamesList)
 
         print("Done", flush=True)
         print(gamesList, flush=True)
@@ -97,27 +97,46 @@ class SteamGame(Game):
 
             if gamedata == None:
                 num += 1
+                print("fail to fetch game")
                 continue
+
+            if gamedata["type"] != "game":
+                continue  # cordialement
 
             steamGame = SteamGame(
                 game["appid"],
-                gamedata["steam_appid"],
-                (
-                    gamedata["price_overview"]["final_formatted"]
-                    if gamedata.__contains__("price_overview")
-                    else ""
-                ),
-                (
-                    SteamGame.getDateFromSteam(gamedata["release_date"]["date"])
-                    if gamedata["release_date"]["coming_soon"] == "true"
-                    else None
-                ),
             )
+
+            steamGame.name = gamedata["name"]
+            steamGame.ageLimit = gamedata["required_age"]
+            steamGame.devs = (
+                gamedata["developers"] if gamedata.__contains__("developers") else []
+            )
+
+            steamGame.platforms = (
+                gamedata["platforms"] if gamedata.__contains__("platforms") else []
+            )
+
+            steamGame.genders = (
+                gamedata["genres"] if gamedata.__contains__("genre") else []
+            )
+
+            steamGame.price = (
+                gamedata["price_overview"]["final_formatted"]
+                if gamedata.__contains__("price_overview")
+                else ""
+            )
+
+            steamGame.release = (
+                SteamGame.getDateFromSteam(gamedata["release_date"]["date"])
+                if not gamedata["release_date"].__contains__("coming_soon")
+                else None
+            )
+
             print(steamGame.toList(), flush=True)
             gamesList.append(steamGame)
             res.append(steamGame)
             num += 1
-        return res
 
     @staticmethod
     def getGameData(appid) -> list:
@@ -126,27 +145,43 @@ class SteamGame(Game):
             appid = str(appid)
 
         url = "https://store.steampowered.com/api/appdetails?appids=" + appid
+
+        print(url)
+
         gamedatajson: requests.Response
         try:
             gamedatajson = requests.get(url)
+            print(gamedatajson.content)
         except:
             return
 
-        if gamedatajson.status_code != "200":
+        gamedata = json.loads(gamedatajson.content)
+        if gamedata == None:
             return
 
-        gamedata = json.loads(gamedatajson.content)
-        if not gamedata.__contains__("appid"):
+        if not gamedata.__contains__(appid):
+            print("cant find appid in json")
             return
         gamedata = gamedata[appid]
 
         if not gamedata["success"]:
+            print("not success for game : " + appid)
             return
 
+        print("SUCCESS AT RETREIVING GAME")
         return gamedata["data"]
 
     def toList(self):
-        return [self.appid, self.name, self.price, str(self.release)]
+        return [
+            self.appid,
+            self.name,
+            self.price,
+            str(self.release),
+            self.devs,
+            self.genders,
+            self.isMultiplayer,
+            self.platforms,
+        ]
 
     @staticmethod
     def getDateFromSteam(date: str) -> datetime:
