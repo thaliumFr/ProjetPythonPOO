@@ -9,13 +9,15 @@ from selenium.webdriver.remote.webelement import WebElement
 from SaveSystem import Csv
 import matplotlib.pyplot as plt
 
-import threading
+from multiprocessing import Process
 
 from graphics import Graphics
 
-maxPagesOnOpenCritics = 766
-DoCrawl = False
-DoAPI = True
+gameLimit = 100
+
+maxPagesOnOpenCritics = 5  # 766 max
+DoCrawl = True
+DoAPI = False
 
 pageDetailsClasses = [
     "companies",
@@ -47,7 +49,7 @@ def CrawlOpenCritics(Multithreading=True):
     )
 
     allLinks = []
-    for y in range(2):
+    for y in range(maxPagesOnOpenCritics):
         crawler_opencritique.driver.get(crawler_opencritique.url + str(y + 1))
 
         crawler_opencritique.reponse()
@@ -116,32 +118,38 @@ def crawlLinks(allLinks):
     crawler_pageDetails.end()
 
 
+def crawlSteam():
+    SteamData = Csv.Load("SteamGames")
+    # API
+    for game in SteamGame.GetAllGames(gameLimit):
+        print(game)
+        print(game.toList())
+        # if data.hasInColumn(game.name):
+        #     data.AddToLine(data.FindInColumn(game.name), game.price)
+        SteamData.Add(game.toList())
+    SteamData.Save()
+
+
 if __name__ == "__main__":
     if DoCrawl:
         CrawlOpenCritics()
 
-    if DoAPI:
-        # API
-        SteamGames = Csv("OpenCritics")
-        for game in SteamGame.GetAllGames():
-            if SteamGames.hasInColumn(game.name):
-                SteamGames.AddToLine(SteamGames.FindInColumn(game.name), game.price)
-
     data = Csv.Load("OpenCritics")
+
+    if DoAPI:
+        crawlSteam()
 
     NoteSum = 0
     points = []
     for y in range(data.lines - 2):
         note = data.content[y + 1][4].strip('"')
         date = data.content[y + 1][3].strip('"')[-4::]
-        print(date)
 
         if note == "none":
             continue
         NoteSum += int(note)
 
         points.append((int(date), int(note)))
-
     Graphics.show2setsPlots(
         "Note per game on years", [points], x_name="Year of release", y_name="Score"
     )

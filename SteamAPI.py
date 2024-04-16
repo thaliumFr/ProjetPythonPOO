@@ -1,11 +1,13 @@
 import datetime
 import json
 from math import floor
+from multiprocessing.managers import DictProxy, ListProxy
+from multiprocessing.sharedctypes import SynchronizedArray
 from matplotlib import dates, pyplot as plt
 import requests
 import time
 
-from multiprocessing import Process
+from multiprocessing import Manager, Process, Array
 
 
 from Game import Game
@@ -36,41 +38,53 @@ class SteamGame(Game):
         self.appid = appid
 
     @staticmethod
-    def GetAllGames() -> list["SteamGame"]:
+    def GetAllGames(limit=-1) -> list["SteamGame"]:
         url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/?key=" + key
         gamesJson = requests.get(url)
         allGames = json.loads(gamesJson.content)["applist"]["apps"]
+
+        if limit > 0:
+            allGames = allGames[:limit]
+
         allGamesLen = len(allGames)
         gamesList = []
 
-        threads = 8
-        allProcesses = []
-        for i in range(threads):
-            mini = floor(i * (allGamesLen / threads))
-            maxi = floor((i + 1) * (allGamesLen / threads))
-            print(f"starting process from {mini} to {maxi}")
-            thread = Process(
-                target=SteamGame.getGameinRange, args=((mini, maxi), gamesList)
-            )
-            allProcesses.append(thread)
+        MULTITHREADING = False
 
-        for thread in allProcesses:
-            thread.start()
+        if MULTITHREADING:
+            threads = 6
+            allProcesses = []
 
-        for thread in allProcesses:
-            thread.join()
+            for i in range(threads):
+                mini = floor(i * (allGamesLen / threads))
+                maxi = floor((i + 1) * (allGamesLen / threads))
+                print(f"starting process from {mini} to {maxi}")
+                thread = Process(
+                    target=SteamGame.getGameinRange, args=(mini, maxi, gamesList)
+                )
+                allProcesses.append(thread)
+                thread.start()
+
+            for thread in allProcesses:
+                thread.join()
+        else:
+            gamesList = SteamGame.getGameinRange(0, allGamesLen, gamesList)
 
         print("Done", flush=True)
-
+        print(gamesList, flush=True)
         return gamesList
 
-    def getGameinRange(minmax: tuple, gamesList):
+    @staticmethod
+    def getGameinRange(mini, maxi, gamesList: list):
         start = time.time()
+        minmax: tuple = (mini, maxi)
         num = 1
         url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/?key=" + key
         gamesJson = requests.get(url)
         allGames = json.loads(gamesJson.content)["applist"]["apps"]
-        allGamesLen = len(allGames)
+
+        res = []
+
         for game in range(minmax[0], minmax[1]):
             game = allGames[game]
             current = time.time()
@@ -99,9 +113,11 @@ class SteamGame(Game):
                     else None
                 ),
             )
-
+            print(steamGame.toList(), flush=True)
             gamesList.append(steamGame)
+            res.append(steamGame)
             num += 1
+        return res
 
     @staticmethod
     def getGameData(appid) -> list:

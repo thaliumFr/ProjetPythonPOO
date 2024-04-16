@@ -27,7 +27,8 @@ class Csv:
 
                 goodLine = []
                 for word in line:
-                    goodLine.append('"' + word + '"')
+
+                    goodLine.append('"' + str(word).strip(r'"') + '"')
 
                 file.write(Csv.__separator.join(goodLine) + "\n")
 
@@ -39,7 +40,9 @@ class Csv:
                 i = i.rstrip("\n")
                 import re
 
-                PATTERN = re.compile(r"""((?:[^,"']|"[^"]*"|'[^']*')+)""")
+                PATTERN = re.compile(
+                    r"""((?:[^""" + Csv.__separator + r""""']|"[^"]*"|'[^']*')+)"""
+                )
 
                 content.append(PATTERN.split(i)[1::2])
 
