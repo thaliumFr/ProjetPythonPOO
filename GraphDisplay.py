@@ -9,7 +9,8 @@ import csv
 # create class columns graph
 class GraphDisplay:
     def __init__(self, nbOfPlots):
-        self.fig, self.ax = plt.subplots(1, nbOfPlots, figsize=(15, 8))
+        self.nbOfPlots = nbOfPlots
+        self.fig, self.ax = plt.subplots(1, nbOfPlots, figsize=(15, 6))
         plt.subplots_adjust(bottom=.3)
         self.pltIdx = 0
 
@@ -26,6 +27,13 @@ class GraphDisplay:
 
     def display(self):
         plt.show()
+
+    def resetPlots(self, nbOfPlots = -1):
+        self.fig, self.ax = plt.subplots(
+            1,
+            self.nbOfPlots if nbOfPlots == -1 else nbOfPlots,
+            figsize=(15, 8))
+        self.pltIdx = 0
 
     # create columns graph
     def showBar(title: str, x: list, y: list, x_name="", y_name=""):
