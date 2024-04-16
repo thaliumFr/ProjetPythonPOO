@@ -30,6 +30,7 @@ while idx < len(criticsFilteredNames):
         del criticsFilteredNames[idx]
         continue
     idx += 1
+criticsGrades = [val[:-1] for val in criticsGrades]
 
 devGrades = [(dev, grade) for (dev, grade) in zip(devs, avgGrades)]
 uDevs = list(set(devs))

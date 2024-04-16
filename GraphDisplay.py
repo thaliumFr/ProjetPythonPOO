@@ -15,7 +15,7 @@ class GraphDisplay:
 
     def addBar(self, title: str, x: list, y: list):
         x_np = np.array(x)
-        y_np = np.array(y)
+        y_np = np.array([int(val) for val in y])
 
         self.ax[self.pltIdx].bar(x_np, y_np)
         self.ax[self.pltIdx].set_title(title)
