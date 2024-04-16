@@ -129,7 +129,7 @@ class SteamGame(Game):
 
             steamGame.release = (
                 SteamGame.getDateFromSteam(gamedata["release_date"]["date"])
-                if not gamedata["release_date"].__contains__("coming_soon")
+                if gamedata["release_date"].__contains__("date")
                 else None
             )
 
@@ -186,7 +186,20 @@ class SteamGame(Game):
     @staticmethod
     def getDateFromSteam(date: str) -> datetime:
         vals = date.split(r" ")
-        day = vals[0]
-        month = SteamGame._months[vals[1].rstrip(",")]
-        year = vals[2]
+
+        if date.lower().__contains__("announced"):
+            return None
+
+        if len(vals) == 3:
+            try:
+                year = vals[2]
+                month = SteamGame._months[vals[1].rstrip(",")]
+                day = vals[0]
+            except:
+                year = vals[2]
+                month = SteamGame._months[vals[0].rstrip(",")]
+                day = vals[1].rstrip(",")
+        else:
+            year = date[-4:]
+            return f"{year}"
         return f"{day}-{month}-{year}"

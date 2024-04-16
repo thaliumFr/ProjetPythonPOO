@@ -8,7 +8,7 @@ from SaveSystem import Csv
 
 from GraphDisplay import GraphDisplay
 
-gameLimit = 1000
+gameLimit = 2000
 
 maxPagesOnOpenCritics = 5  # 766 max
 DoCrawl = False
